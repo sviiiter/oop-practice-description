@@ -1,4 +1,4 @@
-# oop-practice-cribe
+# oop-practice-description
 
 Kinda help of basic oop rules. Contains:
 - SOLID description
