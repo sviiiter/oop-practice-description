@@ -3,8 +3,10 @@
   /*
     Имеем клиентский тип, который нужно "нарядить".
     Создаем декорирующие типы того же интерфейса что и клиентский тип и ссылку на сам клиентский тип
+    В каждом подклассе ДОБАВЛЯЕМ что-то к базовому поведению
     В клиентском приложении используем интерфейс для вызова метода, а реализацию декорирующего класса
-    Profit: вносим конкретику на высоких уронях
+    Как правило используется вместо расширения зафинализированного класса
+    Profit: вносим конкретику на высоких уровнях
   */
 
   interface Html
@@ -18,7 +20,7 @@
   class Page implements Html // init page
   {
 
-    public function add() {
+    final public function add() {
       return self::class;
       /* create file .html */
     }
@@ -57,21 +59,25 @@
 
   }
 
-  class App
-  {
-
-    public static function load(Html $page):string {
-      return $page->add() . "\n"; //Page->Decorator->Decorator->BodyDecorator
-    }
-
-  }
+//  class App
+//  {
+//
+//    public static function load(Html $page):string {
+//      return $page->add() . "\n"; //Page->Decorator->Decorator->BodyDecorator
+//    }
+//
+//  }
 
   $page = new Page();
   $decorator = new Decorator($page);
   $decorator1 = new BodyDecorator($decorator);
-  echo App::load($page);
-  echo App::load($decorator);
-  echo App::load($decorator1);
+
+
+  echo $decorator1->add() . "\n";
+
+//  echo App::load($page);
+//  echo App::load($decorator);
+//  echo App::load($decorator1);
 
 
 

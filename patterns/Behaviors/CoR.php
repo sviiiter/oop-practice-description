@@ -3,69 +3,77 @@
   /*
    * Chain of Responsibility
    * Потомку устанавливают указатель на следующий класс того же интерфейса.
-   * Далее можно провести проверку ДО или ПОСЛЕ выполнения задачи потомка и вызвать выполнение одноименной задачи.
+   * Далее можно провести проверку ДО или ПОСЛЕ выполнения задачи потомка и вызвать выполнение одноименной задачи потомка.
+   *
+   * По принципу действия цепочки похож на конструкцию if - else
+   *
    */
 
-  interface CoR
-  {
-
-    public function setNext(CoR $obj);
-
-
-    public function do();
-
-  }
-
-
-  abstract class BaseCor implements CoR
+  abstract class BaseCor
   {
 
     /* @var BaseCor $_knot */
     protected $_knot;
-    public $name;
 
-    public function setNext(CoR $obj) {
+    /** @var false|mixed has check failed */
+    protected $stop;
+
+
+    public function __construct($stop = false) {
+      $this->stop = $stop;
+    }
+
+
+    public function setNext(BaseCor $obj) {
       $this->_knot = $obj;
     }
 
 
     public function do() {
-      if ($this->_knot instanceof CoR) {
-        echo sprintf('Current knot name %s. Knot name is %s', $this->name, $this->_knot->name) . "\n";
-        $this->_knot->do();
+
+      if ($this->stop) {
+        echo 'failed.' . "\n";
+      } else {
+        $this->printAction();
+        if ($this->_knot instanceof BaseCor) {
+          $this->_knot->do();
+        }
       }
     }
 
+    abstract public function printAction();
+
   }
 
-  class ConcreteFirst extends BaseCor
+  class Check extends BaseCor
   {
 
-    public $isStop = false;
-
-
-    public function __construct($name) {
-      $this->name = $name;
+    public function printAction() {
+      echo 'check input' . "\n";
     }
 
-
-    public function do() {
-      if ($this->isStop === true) { // some check
-        echo 'Flag' . "\n";
-        die;
-      }
-      parent::do();
-    }
   }
 
-  $a = new ConcreteFirst('knot1');
-  $a->isStop = true;
-  $b = new ConcreteFirst('knot2');
-  $c = new ConcreteFirst('knot3');
+  class Save extends BaseCor
+  {
 
-  $b->setNext($a);
-  $c->setNext($b);
-  $c->do();
+    public function printAction() {
+      echo 'save into db' . "\n";
+    }
+
+
+  }
+
+  $a = new Check();
+  $b = new Save(true);
+
+  $a->setNext($b);
+  $a->do();
+
+  echo "\n";
+  $c = new Save();
+  $a->setNext($c);
+  $a->do();
 
 
 
