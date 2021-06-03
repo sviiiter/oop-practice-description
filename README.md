@@ -2,4 +2,4 @@
 
 Kinda help of basic oop rules. Contains:
 - SOLID description
-- Basic patterns collection. Getting updated in time.
+- Basic patterns collection. Getting update in time.
