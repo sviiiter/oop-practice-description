@@ -15,7 +15,7 @@
   {
 
     /** @var array $in primary keys */
-    public $in;
+    public $in = [];
 
     public $order = [];
 
@@ -103,6 +103,36 @@
   }
 
 
+  class ProductPage extends DecoratorCase implements iDecor
+  {
+
+    protected $pageId;
+
+    public function __construct(iDecor $obj, $pageId) {
+      $this->pageId = $pageId;
+      parent::__construct($obj);
+    }
+
+
+    /**
+     * Mock query method
+     *
+     * @return array
+     */
+    protected function __getProductsByPage(): array {
+      // kind of sql query from related page and return array of int
+      return [9, 8, 7];
+    }
+
+    public function getProvider(): Provider {
+      $stack = $this->__getProductsByPage();
+      $provider = $this->decorated->getProvider();
+      $provider->in = array_merge($provider->in, $stack);
+      return $provider;
+    }
+
+  }
+
   class SimpleSqlBuilder
   {
 
@@ -172,6 +202,7 @@
   $filter = new SortProviderDecorator($filter, 'price', true);
   $filter = new SortProviderDecorator($filter, 'factory', false);
   $filter = new FactoryProviderDecor($filter, 'Toyota');
+  $filter = new ProductPage($filter, 12);
 
   echo (new SimpleSqlBuilder($filter->getProvider()))->getSql() . "\n";
 
@@ -180,3 +211,11 @@
   $provider = new Provider();
   $filter = new SortProviderDecorator($provider, 'price', true);
   echo (new SimpleSqlBuilder($filter->getProvider()))->getSql() . "\n";
+
+
+/* output:
+select * from `tableName` where `id` in (1,2,3)
+select * from `tableName` where `id` in (1,2,3) AND `factory` in ('Panasonic','Adidas') order by `price` desc,`factory` asc
+select * from `tableName` where `id` in (1,2,3,9,8,7) AND `factory` in ('Panasonic','Adidas') AND `factory`='Toyota' order by `price` desc,`factory` asc
+select * from `tableName` where  order by `price` desc
+*/
