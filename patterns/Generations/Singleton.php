@@ -3,13 +3,13 @@
   class Singleton
   {
     
-    private static $_instanse;
+    private static $_instance;
 
     private function __construct() {}
 
 
     public static function getInstance(): Singleton {
-      return static::$_instanse = static::$_instanse ?? new static;
+      return static::$_instance = static::$_instance ?? new static;
     }
 
   }
