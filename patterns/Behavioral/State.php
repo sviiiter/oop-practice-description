@@ -1,25 +1,24 @@
-<?php
+﻿<?php
 
   /*
   В объект клиентского класса внедряется объект другого класса, содержащий в себе реализацию задачи.
   Для реализаций разных задач, соответственно задачам, создают несколько разных типов одного интерфейса и внедряют объект интерфейса
 */
 
-  class Job
+
+  abstract class State
   {
 
-    /** @var State */
-    private $_state;
+    /** @var Job */
+    protected $_subject;
 
 
-    public function do() {
-      $this->_state->do($this);
+    public function __construct(Job $j) {
+      $this->_subject = $j;
     }
 
 
-    public function toggleState(State $s) {
-      $this->_state = $s;
-    }
+    abstract public function do();
 
   }
 
@@ -58,19 +57,21 @@
   }
 
 
-  abstract class State
+  class Job
   {
 
-    /** @var Job */
-    protected $_subject;
+    /** @var State */
+    private $_state;
 
 
-    public function __construct(Job $j) {
-      $this->_subject = $j;
+    public function do() {
+      $this->_state->do();
     }
 
 
-    abstract public function do();
+    public function toggleState(State $s) {
+      $this->_state = $s;
+    }
 
   }
 
